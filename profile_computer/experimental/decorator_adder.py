@@ -1,5 +1,6 @@
 import ast
 import astor
+import os
 
 def add_decorator(file_path, decorator_name) -> str:
     """
@@ -22,12 +23,12 @@ def add_decorator(file_path, decorator_name) -> str:
             node.decorator_list.insert(0, ast.Name(id=decorator_name, ctx=ast.Load()))
 
     # TODO: Add a timestamp to reduce collisions.
-    file_name_to_profile = file_path.split()[0] + '_profile_decorated.py'
+    file_path_to_profile = os.path.splitext(file_path)[0] + '_profile_decorated' + os.path.splitext(file_path)[1]
 
-    with open(file_name_to_profile, 'w') as f:
+    with open(file_path_to_profile, 'w') as f:
         f.write(astor.to_source(tree))
     
-    return file_name_to_profile
+    return file_path_to_profile
 
 
 # if __name__ == '__main__':
