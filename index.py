@@ -65,6 +65,9 @@ def main(repo: str, owner: str, pr_number: int):
 
     # convert return to dict 
     return_dict = dict(return_dict)
+    if len(return_dict) != 2:
+        print('ERROOOOR' * 20)
+        return 
     # Generate code changes and get approval, up to 3 times or until approved
     for _ in range(3):
         try: 
