@@ -65,16 +65,26 @@ def main(repo: str, owner: str, pr_number: int):
 
     # convert return to dict 
     return_dict = dict(return_dict)
+    # Generate code changes and get approval, up to 3 times or until approved
+    for _ in range(3):
+        try: 
 
-    # Generate code changes based on the latency results
-    remote_branch, pr_title, pr_description = generate_code_change(owner, repo, pr_number, return_dict)
+            remote_branch, pr_title, pr_description = generate_code_change(owner, repo, pr_number, return_dict)
 
-    # get latency profile after code changes 
-    latency_res_after_llm = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
+            # get latency profile after code changes 
+            latency_res_after_llm = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
 
-    res_approval = approve_latency_change(
-        before_results=return_dict.get('after', {}), 
-        after_results=latency_res_after_llm)
+            res_approval = approve_latency_change(
+                before_results=return_dict.get('after', {}), 
+                after_results=latency_res_after_llm)
+
+            if res_approval.is_approved:
+                break
+
+        except Exception as e:
+            print(e)
+
+    # If we've exited the loop, either we've got approval or we've run out of attempts
     
     if res_approval.is_approved:
         pr_url, _ = generate_pull_request(
