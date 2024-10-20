@@ -4,6 +4,7 @@ from typing import Dict
 import multiprocessing
 from codechanger import generate_code_change, add_comment, generate_pull_request, get_pr_information
 from repo_fetcher import clone_pr_to_sandbox
+from llm import ChangeApprover
 
 app = FastAPI()
 
@@ -16,7 +17,11 @@ class ProfileResponse(BaseModel):
     profile_results: Dict[str, float]
 
 def approve_latency_change(before_pr, with_pr, suggested_change):
-    return {"is_approved": True}
+    res = ChangeApprover().get_response(
+        before_results=before_pr,
+        after_results=with_pr
+    )
+    return res 
 
 @app.get("/")
 def hi():
@@ -61,7 +66,7 @@ def main(repo: str, owner: str, pr_number: int):
 
     
     # Generate code changes based on the latency results
-    remote_branch = generate_code_change(owner, repo, pr_number, return_dict)
+    remote_branch, pr_title, pr_description = generate_code_change(owner, repo, pr_number, return_dict)
 
     # get latency profile after code changes 
     res = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
@@ -75,9 +80,11 @@ def main(repo: str, owner: str, pr_number: int):
         pr_url, _ = generate_pull_request(
             branch_name=remote_branch,
             owner=owner,
-            repo=repo
+            repo=repo,
+            title=pr_title,
+            description=pr_description
         )
-        add_comment(owner, repo, pr_number, pr_url, res_approval)
+        add_comment(owner, repo, pr_number, pr_url, res_approval['improvement_message'])
 
 
 
