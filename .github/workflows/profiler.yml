@@ -1,0 +1,27 @@
+name: Profiler AI Latency Regression Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  latency-regression:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Make POST request
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repo": "${{ github.repository }}",
+              "owner": "${{ github.repository_owner }}",
+              "pr_number": "${{ github.event.pull_request.number }}"
+            }' \
+            http://localhost:8090.com

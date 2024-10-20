@@ -2,3 +2,9 @@ line_profiler
 astor
 fastapi[standard]
 requests
+pydantic 
+tqdm 
+python-dotenv 
+langchain-anthropic
+anthropic
+pygithub
