@@ -3,10 +3,7 @@ import time
 
 def some_function(n):
     """Performs a computationally intensive task with a string."""
-    result = '.'
-    for i in range(n):
-        result += result
-    return result
+    return '.' * (2**n)
 
 
 def main():
