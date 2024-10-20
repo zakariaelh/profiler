@@ -46,12 +46,12 @@ def main(repo: str, owner: str, pr_number: int):
     print(f"Received request for repo: {repo}, owner: {owner}, PR: {pr_number}")
 
     pr_info = get_pr_information(owner, repo, pr_number)
-    base_branch = pr_info['base']['ref']
+    base_hash = pr_info['base']['sha']
     
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
 
-    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'branch_name': base_branch, 'return_dict': return_dict, 'key': 'before'})
+    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'branch_name': base_hash, 'return_dict': return_dict, 'key': 'before'})
     p2 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'return_dict': return_dict, 'key': 'after'})
 
     # start processes 
@@ -64,7 +64,6 @@ def main(repo: str, owner: str, pr_number: int):
     # convert return to dict 
     return_dict = dict(return_dict)
 
-    
     # Generate code changes based on the latency results
     remote_branch, pr_title, pr_description = generate_code_change(owner, repo, pr_number, return_dict)
 
@@ -76,7 +75,7 @@ def main(repo: str, owner: str, pr_number: int):
         with_pr=return_dict.get('after', {}), 
         suggested_change=res)
     
-    if res_approval['is_approved']:
+    if True or res_approval.is_approved:
         pr_url, _ = generate_pull_request(
             branch_name=remote_branch,
             owner=owner,
@@ -84,7 +83,7 @@ def main(repo: str, owner: str, pr_number: int):
             title=pr_title,
             description=pr_description
         )
-        add_comment(owner, repo, pr_number, pr_url, res_approval['improvement_message'])
+        add_comment(owner, repo, pr_number, pr_url, res_approval.approval_message)
 
 
 

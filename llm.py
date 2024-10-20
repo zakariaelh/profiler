@@ -25,10 +25,10 @@ class Patch(BaseModel):
 class FileChange(BaseModel):
     """List of all the changes to make to the file."""
     changes: list[CodeChange] = Field(description="List of specific code changes")
-    tile: str = Field(description="Overall title for the change mande. This will go into the pull request title.")
+    title: str = Field(description="Overall title for the change mande. This will go into the pull request title.")
     description: str = Field(description="High-level description for all the changes made. This will be the description of the pull request.")
 
-class ApprovalResutl(BaseModel):
+class ApprovalResult(BaseModel):
     """Approval Results for making the change."""
     is_approved: bool = Field(description="Boolean for whether or not to approve the change.")
     approval_message: str = Field(description="High level comments about the latency improvements.")
@@ -119,7 +119,7 @@ class LineChangeFixer:
 class ChangeApprover:
     def __init__(self):
         llm = ChatAnthropic(model="claude-3-5-sonnet-20240620")
-        structured_llm = llm.with_structured_output(ApprovalResutl)
+        structured_llm = llm.with_structured_output(ApprovalResult)
         system = """
         You are a smart and cautious software engineer
         """
@@ -142,7 +142,7 @@ class ChangeApprover:
 
         self.runnable = prompt_template | structured_llm
 
-    def get_response(self, before_results, after_results) -> ApprovalResutl:
+    def get_response(self, before_results, after_results) -> ApprovalResult:
         res = self.runnable.invoke(
             {
                 "before_results": before_results, 

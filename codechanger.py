@@ -261,11 +261,5 @@ def add_comment(owner, repo, pr_number, url, improvement_message: float):
     """Adds a comment to a PR suggesting code improvement."""
     repository = github_client.get_repo(f"{owner}/{repo}")
     pr = repository.get_pull(pr_number)
-    comment = f"""
-    Hey there, Profiler AI has made a few optimizations to your latest PR. 
-
-    {improvement_message}
-    
-    You can see the changes in [this pull request]({url}).
-    """
+    comment = f"Hey there, Profiler AI has made a few optimizations to your latest PR. \n\n {improvement_message} \n\n You can see the changes in [this pull request]({url})."
     pr.create_issue_comment(comment)
