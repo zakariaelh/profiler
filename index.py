@@ -26,11 +26,11 @@ async def get_profile(request: ProfileRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start profiler process: {str(e)}")
 
-def get_latency_profile(owner, repo, pr_number, remote_branch, return_dict=None, key=None):
-    if not pr_number:
-        tmp =  "50ms"
+def get_latency_profile(owner, repo, pr_number=None, branch_name=None, return_dict=None, key=None):
+    if pr_number:
+        tmp =  "100ms"
     else:
-        tmp = "100ms"
+        tmp = "50ms"
     if return_dict is not None and key:
         return_dict[key] = tmp 
     return tmp 

