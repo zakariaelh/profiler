@@ -255,7 +255,7 @@ def generate_code_change(owner, repo, pr_number, latency_profile):
 
     if changes_made:
         remote_branch = publish_branch(local_branch_name=branch_name, directory=full_directory)
-        return remote_branch, res['title'], res['description']
+        return remote_branch, res.title, res.description
 
 def add_comment(owner, repo, pr_number, url, improvement_message: float):
     """Adds a comment to a PR suggesting code improvement."""
