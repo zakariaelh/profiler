@@ -1,0 +1,70 @@
+Timer unit: 1e-06 s
+
+Total time: 2.83e-05 s
+File: C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\cookie_test.py
+Function: some_function at line 5
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     5                                           @profile                                                          
+     6                                           def some_function(n):                                             
+     7                                               """Performs a computationally intensive task with a string."""
+     8         1          0.4      0.4      1.4      result = '.'                                                  
+     9        15          6.5      0.4     23.0      for i in range(n):                                            
+    10        14         20.9      1.5     73.9          result += result                                          
+    11         1          0.5      0.5      1.8      return result                                                 
+
+
+Total time: 0.0075225 s
+File: C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\cookie_test.py
+Function: main at line 14
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    14                                           @profile                                                     
+    15                                           def main():                                                  
+    16                                               """Main function to demonstrate profiling with string."""
+    17         1          0.5      0.5      0.0      n = 14                                                   
+    18         1          1.7      1.7      0.0      start_time = time.time()                                 
+    19         1         41.8     41.8      0.6      result = some_function(n)                                
+    20         1          0.5      0.5      0.0      end_time = time.time()                                   
+    21         1       7374.3   7374.3     98.0      print('Result:', result)                                 
+    22         1        103.7    103.7      1.4      print('Elapsed time:', end_time - start_time, 'seconds') 
+
+
+Total time: 4.82828 s
+File: C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\grundy_test.py
+Function: my_function at line 5
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+     5                                           @profile                                            
+     6                                           def my_function(n):                                 
+     7                                               """Performs a computationally intensive task."""
+     8         1          0.5      0.5      0.0      result = 0                                      
+     9  10000001    2422895.6      0.2     50.2      for i in range(n):                              
+    10  10000000    2405378.8      0.2     49.8          result += i * i                             
+    11         1          1.9      1.9      0.0      return result                                   
+
+
+Total time: 8.13456 s
+File: C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\grundy_test.py
+Function: main at line 14
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    14                                           @profile                                                    
+    15                                           def main():                                                 
+    16                                               """Main function to demonstrate profiling."""           
+    17         1          1.0      1.0      0.0      n = 10000000                                            
+    18         1          3.0      3.0      0.0      start_time = time.time()                                
+    19         1    8133645.6    8e+06    100.0      result = my_function(n)                                 
+    20         1          5.0      5.0      0.0      end_time = time.time()                                  
+    21         1        544.9    544.9      0.0      print('Result:', result)                                
+    22         1        360.7    360.7      0.0      print('Elapsed time:', end_time - start_time, 'seconds')
+
+
+  0.00 seconds - C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\cookie_test.py:5 - some_function
+  0.01 seconds - C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\cookie_test.py:14 - main
+  4.83 seconds - C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\grundy_test.py:5 - my_function
+  8.13 seconds - C:\Users\mouss\Documents\Projects\Profiler\profiler\profile_computer\experimental\grundy_test.py:14 - main

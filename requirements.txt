@@ -1,2 +1,4 @@
 line_profiler
 astor
+fastapi[standard]
+requests
