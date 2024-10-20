@@ -3,7 +3,7 @@ import astor
 
 def add_decorator(file_path, decorator_name) -> str:
     """
-    Automatically adds the specified decorator to all functions defined in the given file.
+    Automatically    adds the specified decorator to all functions defined in the given file.
 
     Args:
         file_path (str): The path to the Python file.
