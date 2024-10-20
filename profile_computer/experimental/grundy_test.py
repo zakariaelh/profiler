@@ -1,17 +1,15 @@
 import time
+from functools import lru_cache
 
-
+@lru_cache(maxsize=None)
 def my_function(n):
     """Performs a computationally intensive task."""
-    result = 0
-    for i in range(n):
-        result += i * i
-    return result
+    return sum(i * i for i in range(n))
 
 
 def main():
     """Main function to demonstrate profiling."""
-    n = 20000000
+    n = 10000000
     start_time = time.time()
     result = my_function(n)
     end_time = time.time()
