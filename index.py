@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict
 import multiprocessing
-from codechanger import generate_code_change, add_comment, generate_pull_request
+from codechanger import generate_code_change, add_comment, generate_pull_request, get_pr_information
+from repo_fetcher import clone_pr_to_sandbox
 
 app = FastAPI()
 
@@ -17,6 +18,10 @@ class ProfileResponse(BaseModel):
 def approve_latency_change(before_pr, with_pr, suggested_change):
     return {"is_approved": True}
 
+@app.get("/")
+def hi():
+    return "Hi, welcome to profiler."
+
 @app.post("/get-profile", status_code=200)
 async def get_profile(request: ProfileRequest):
     try:
@@ -26,23 +31,23 @@ async def get_profile(request: ProfileRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start profiler process: {str(e)}")
 
-def get_latency_profile(owner, repo, pr_number=None, branch_name=None, return_dict=None, key=None):
-    if pr_number:
-        tmp =  "100ms"
-    else:
-        tmp = "50ms"
-    if return_dict is not None and key:
-        return_dict[key] = tmp 
-    return tmp 
+def get_latency_profile(owner, repo, pr_number, branch_name=None, return_dict=None, key=None):
+
+    res = clone_pr_to_sandbox(owner=owner, repo=repo, pr_number=pr_number, branch_name=branch_name)
+    
+    return_dict[key] = res
 
 def main(repo: str, owner: str, pr_number: int):
     print(f"Received request for repo: {repo}, owner: {owner}, PR: {pr_number}")
+
+    pr_info = get_pr_information(owner, repo, pr_number)
+    base_branch = pr_info['base']['ref']
     
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
 
-    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo, None, return_dict, 'before'))
-    p2 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo, pr_number, return_dict, 'after'))
+    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'branch_name': base_branch, 'return_dict': return_dict, 'key': 'before'})
+    p2 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'return_dict': return_dict, 'key': 'after'})
 
     # start processes 
     p1.start()
@@ -53,12 +58,13 @@ def main(repo: str, owner: str, pr_number: int):
 
     # convert return to dict 
     return_dict = dict(return_dict)
+
     
     # Generate code changes based on the latency results
     remote_branch = generate_code_change(owner, repo, pr_number, return_dict)
 
     # get latency profile after code changes 
-    res = get_latency_profile(owner, repo, branch_name=remote_branch, return_dict={})
+    res = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
 
     res_approval = approve_latency_change(
         before_pr=return_dict.get('before', {}), 

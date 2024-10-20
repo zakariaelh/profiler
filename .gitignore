@@ -54,3 +54,5 @@ docs/_build/
 .env
 __pycache__/*
 profile_computer/secret.py
+
+.DS_Store
