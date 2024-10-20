@@ -1,16 +1,19 @@
 import subprocess
 import argparse
 import decorator_adder
-import os
 
 parser = argparse.ArgumentParser(description='Profile Runner Arguments.')
 
-parser.add_argument('--file_path', action="store", dest='file_path', default='')
+parser.add_argument('--file_paths_to_profile', action="store", dest='file_paths_to_profile', default='')
+parser.add_argument('--entry_point', action="store", dest='entry_point', default='')
 
 args = parser.parse_args()
 
-file_path_to_profile = decorator_adder.add_decorator(args.file_path, 'profile')
-profile_binary_file_path = os.path.splitext(file_path_to_profile)[0] + '_profile_decorated_profile.binary_prof'
-profile_text_file_path = os.path.splitext(file_path_to_profile)[0] + '_profile_decorated_profile.txt'
+for file_path_to_profile in str.split(args.file_paths_to_profile, ','):
+    decorator_adder.add_decorator(file_path_to_profile, 'profile')
 
-subprocess.run(f'kernprof -l -v -o {profile_binary_file_path} {file_path_to_profile}', stdout=open(profile_text_file_path, 'w'))
+profile_path = 'latency_profile.lprof'
+profile_path_txt = 'latency_profile.txt'
+# TODO: Suppress STDOUT from first subprocess.
+subprocess.run(f'kernprof -l -o {profile_path} {args.entry_point}')
+subprocess.run(f'python -m line_profiler -rtmz {profile_path}', stdout=open(profile_path_txt, 'w'))
