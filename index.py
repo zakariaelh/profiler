@@ -29,6 +29,7 @@ def hi():
 
 @app.post("/get-profile", status_code=200)
 async def get_profile(request: ProfileRequest):
+    print(request)
     try:
         # Start the main process without waiting for results
         multiprocessing.Process(target=main, args=(request.repo, request.owner, request.pr_number)).start()
