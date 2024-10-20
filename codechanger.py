@@ -194,10 +194,12 @@ def go_to_branch(owner, repo, pr_number):
 
 def publish_branch(local_branch_name, directory):
     try:
+        remote_branch = local_branch_name
         subprocess.run("git add .", shell=True, check=True, cwd=directory)
         subprocess.run('git commit -m "optimization by profiler"', shell=True, check=True, cwd=directory)
-        subprocess.run(f"git push origin {local_branch_name}:{local_branch_name}", shell=True, check=True, cwd=directory)
+        subprocess.run(f"git push origin {local_branch_name}:{remote_branch}", shell=True, check=True, cwd=directory)
         print(f"Successfully published branch {local_branch_name}")
+        return remote_branch
     except subprocess.CalledProcessError as e:
         print(f"Error publishing branch: {e}")
         raise
@@ -222,7 +224,7 @@ def is_python_file(filename):
     return filename.lower().endswith('.py')
 
 
-def main(owner, repo, pr_number):
+def generate_code_change(owner, repo, pr_number, latency_profile):
     # flag to check if we made any code changes 
     changes_made = False
     full_directory, branch_name = go_to_branch(
@@ -230,13 +232,12 @@ def main(owner, repo, pr_number):
         repo=repo,
         pr_number=pr_number
     )
-    # get latency profile 
-    latency_profile = "100ms"
     # get files in the pr  
     pr_files = get_pr_files(owner=owner, repo=repo, pr_number=pr_number)
+    print(f'Number of files to change: {len(pr_files)}')
 
     for file in tqdm(pr_files):
-        if is_python_file(file):
+        if is_python_file(file['filename']):
             # add directory data 
             file['local_file_path'] = os.path.join(full_directory, file['filename'])
             # get code changes 
@@ -251,14 +252,12 @@ def main(owner, repo, pr_number):
                     changes_made = True 
 
     if changes_made:
-        publish_branch(local_branch_name=branch_name, directory=full_directory)
-        pr_url, pr_number = generate_pull_request(branch_name, owner=owner, repo=repo)
-        add_comment(owner, repo, pr_number, pr_url)
-        return pr_number
+        remote_branch = publish_branch(local_branch_name=branch_name, directory=full_directory)
+        return remote_branch
 
-def add_comment(owner, repo, pr_number, url):
+def add_comment(owner, repo, pr_number, url, res_approval):
     """Adds a comment to a PR suggesting code improvement."""
     repository = github_client.get_repo(f"{owner}/{repo}")
     pr = repository.get_pull(pr_number)
-    comment = f"Your code can be improved. Check the PR at the following URL: {url}"
+    comment = f"Your code can be improved. Check the PR at the following URL: {url}\n Here are the improvements: {res_approval}"
     pr.create_issue_comment(comment)
