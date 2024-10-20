@@ -68,7 +68,7 @@ def get_prompt():
 
     Latency profile results: {latency_results}"
 
-    Please provide specific optimization suggestions based on this information. Return the file updated with the changes made.
+    Please provide specific optimization suggestions based on this information. Return the file updated with the changes made. Also make sure to add comments explaining the changes made.
     """
 
 def get_system_message():

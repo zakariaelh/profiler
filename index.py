@@ -16,10 +16,10 @@ class ProfileRequest(BaseModel):
 class ProfileResponse(BaseModel):
     profile_results: Dict[str, float]
 
-def approve_latency_change(before_pr, with_pr, suggested_change):
+def approve_latency_change(before_results, after_results):
     res = ChangeApprover().get_response(
-        before_results=before_pr,
-        after_results=with_pr
+        before_results=before_results,
+        after_results=after_results
     )
     return res 
 
@@ -41,6 +41,7 @@ def get_latency_profile(owner, repo, pr_number, branch_name=None, return_dict=No
     res = clone_pr_to_sandbox(owner=owner, repo=repo, pr_number=pr_number, branch_name=branch_name)
     
     return_dict[key] = res
+    return res 
 
 def main(repo: str, owner: str, pr_number: int):
     print(f"Received request for repo: {repo}, owner: {owner}, PR: {pr_number}")
@@ -68,14 +69,13 @@ def main(repo: str, owner: str, pr_number: int):
     remote_branch, pr_title, pr_description = generate_code_change(owner, repo, pr_number, return_dict)
 
     # get latency profile after code changes 
-    res = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
+    latency_res_after_llm = get_latency_profile(owner, repo, pr_number=pr_number, branch_name=remote_branch, return_dict={})
 
     res_approval = approve_latency_change(
-        before_pr=return_dict.get('before', {}), 
-        with_pr=return_dict.get('after', {}), 
-        suggested_change=res)
+        before_results=return_dict.get('after', {}), 
+        after_results=latency_res_after_llm)
     
-    if True or res_approval.is_approved:
+    if res_approval.is_approved:
         pr_url, _ = generate_pull_request(
             branch_name=remote_branch,
             owner=owner,
@@ -84,6 +84,9 @@ def main(repo: str, owner: str, pr_number: int):
             description=pr_description
         )
         add_comment(owner, repo, pr_number, pr_url, res_approval.approval_message)
+    else:
+        print('Changes were not approved')
+        print(res_approval.approval_message)
 
 
 

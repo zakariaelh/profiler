@@ -10,7 +10,7 @@ def remove_ansi_escape_sequences(text):
 def get_latency_profile(file_paths_to_profile, entry_point, sandbox_name):
     for file_path_to_profile in str.split(file_paths_to_profile, ','):
         decorator_adder.add_decorator(file_path_to_profile, 'profile')
-    decorator_adder.add_decorator(entry_point, 'profile')
+    decorator_adder.add_decorator(f'{sandbox_name}/{entry_point}', 'profile')
 
     python_path = f"venv/bin/python"
 
