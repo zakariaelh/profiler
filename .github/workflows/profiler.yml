@@ -7,7 +7,7 @@ on:
 
 jobs:
   latency-regression:
-    if: github.event.pull_request.user.login == 'profilerai'
+    if: github.event.pull_request.user.login != 'profilerai'
     runs-on: ubuntu-latest
     
     steps:
