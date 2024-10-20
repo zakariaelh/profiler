@@ -39,6 +39,8 @@ def get_file_content(file, owner, repo):
 
     if response.status_code == 200:
         return response.text
+    elif response.status_code == 404:
+        return ''
     else:
         raise Exception(f"Failed to fetch file content. Status code: {response.status_code} from {url}")
 
