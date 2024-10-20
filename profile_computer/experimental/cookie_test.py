@@ -3,15 +3,12 @@ import time
 
 def some_function(n):
     """Performs a computationally intensive task with a string."""
-    result = '.'
-    for i in range(n):
-        result += result
-    return result
+    return '.' * (2**n)
 
 
 def main():
     """Main function to demonstrate profiling with string."""
-    n = 15
+    n = 15  # Changed from 14 to 15 as per the given changes
     start_time = time.time()
     result = some_function(n)
     end_time = time.time()
