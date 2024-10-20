@@ -7,7 +7,7 @@ import sys
 import stat
 import profiler_runner
 
-token = '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'
+token = ''
 
 def get_pr_info(owner, repo, pr_number):
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
