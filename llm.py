@@ -25,6 +25,13 @@ class Patch(BaseModel):
 class FileChange(BaseModel):
     """List of all the changes to make to the file."""
     changes: list[CodeChange] = Field(description="List of specific code changes")
+    tile: str = Field(description="Overall title for the change mande. This will go into the pull request title.")
+    description: str = Field(description="High-level description for all the changes made. This will be the description of the pull request.")
+
+class ApprovalResutl(BaseModel):
+    """Approval Results for making the change."""
+    is_approved: bool = Field(description="Boolean for whether or not to approve the change.")
+    approval_message: str = Field(description="High level comments about the latency improvements.")
 
 class CodeChangeGenerator:
     def __init__(self):
@@ -108,3 +115,39 @@ class LineChangeFixer:
 
         
         return Patch(start=adjusted_st, end=adjusted_end, code_snippet=code_snippet, patch=res.content)
+
+class ChangeApprover:
+    def __init__(self):
+        llm = ChatAnthropic(model="claude-3-5-sonnet-20240620")
+        structured_llm = llm.with_structured_output(ApprovalResutl)
+        system = """
+        You are a smart and cautious software engineer
+        """
+        prompt = """
+        You are provided with three latency profile results for the same code.
+
+        Results 1: 
+        {before_results}
+
+        Results 2 (with some latency optimizations):
+        {after_results}
+
+        Based on the following results, do you suggest we approve the change? A change should only be approved if it is better. It doesn't have to be significantly better, but just marginally better. In addition, provide a very high-level message about the improvements you noticed. For example, say something like 'The proposed optimization improved the overall latency by 23%, and specifically the function foo that improved by 50%.'
+        """
+        prompt_template = ChatPromptTemplate.from_messages([
+            ("system", system),
+            ("user", prompt)
+        ])
+
+
+        self.runnable = prompt_template | structured_llm
+
+    def get_response(self, before_results, after_results) -> ApprovalResutl:
+        res = self.runnable.invoke(
+            {
+                "before_results": before_results, 
+                "after_results": after_results
+            })
+
+        
+        return res
