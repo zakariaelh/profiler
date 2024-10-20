@@ -16,7 +16,7 @@ jobs:
           curl -X POST \
             -H "Content-Type: application/json" \
             -d '{
-              "repo": "${{ github.repository_name }}",
+              "repo": "${{ github.repository }}",
               "owner": "${{ github.repository_owner }}",
               "pr_number": "${{ github.event.pull_request.number }}"
             }' \

@@ -32,7 +32,7 @@ async def get_profile(request: ProfileRequest):
     print(request)
     try:
         # Start the main process without waiting for results
-        multiprocessing.Process(target=main, args=(request.repo, request.owner, request.pr_number)).start()
+        multiprocessing.Process(target=main, args=(request.repo.split('/')[1], request.owner, request.pr_number)).start()
         return {"message": "Profiler process started successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to start profiler process: {str(e)}")
