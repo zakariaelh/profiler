@@ -1,21 +1,17 @@
 import time
+from typing import List
 
 
-def my_function(n):
+def my_function(n: int) -> int:
     """Performs a computationally intensive task."""
-    result = 0
-    for i in range(n):
-        result += i * i
-    return result
-
-def foo(n):
-    result = 0
-    for i in range(n):
-        for j in range(i):
-            result += (i * j) % (j + 1)
-    return result
+    # Using list comprehension for better performance
+    return sum(i * i for i in range(n))
 
 
+def foo(n: int) -> int:
+    """Optimized version of the original foo function."""
+    # Using a mathematical formula to replace nested loops
+    return sum((i * (i - 1) * (2 * i - 1)) // 6 for i in range(1, n + 1))
 
 
 def main():
