@@ -56,3 +56,5 @@ __pycache__/*
 profile_computer/secret.py
 
 .DS_Store
+
+latency_profile.txt
