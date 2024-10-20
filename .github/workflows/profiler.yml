@@ -20,4 +20,4 @@ jobs:
               "owner": "${{ github.repository_owner }}",
               "pr_number": "${{ github.event.pull_request.number }}"
             }' \
-            https://0081-73-63-172-114.ngrok-free.app
+            https://0081-73-63-172-114.ngrok-free.app/get-profile
