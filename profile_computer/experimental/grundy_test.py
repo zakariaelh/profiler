@@ -14,11 +14,7 @@ def dot_product(a, b):
     if len(a) != len(b):
         raise ValueError("Vectors must have the same length")
     
-    result = 0
-    for i in range(len(a)):
-        temp = a[i]
-        for _ in range(b[i]):
-            result += temp
+    result = sum([a[i] * b[i] for i in range(len(a))])
     
     return result
 
