@@ -39,6 +39,8 @@ def get_file_content(file, owner, repo):
 
     if response.status_code == 200:
         return response.text
+    elif response.status_code == 404:
+        return ''
     else:
         raise Exception(f"Failed to fetch file content. Status code: {response.status_code} from {url}")
 
@@ -55,7 +57,6 @@ def remove_line_numbers(content):
 def add_file_content_inplace(file, owner, repo) -> str:
     # get file content 
     file_content = get_file_content(file, owner, repo)
-
     # add line number to each line 
     numbered_content = add_line_numbers(file_content)
 

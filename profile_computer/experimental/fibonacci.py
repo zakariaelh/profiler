@@ -11,5 +11,5 @@ def fibonacci_sum(n):
     return total_sum
 
 def main():
-    n = 1000
+    n = 20
     fibonacci_sum(n)
