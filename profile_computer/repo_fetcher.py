@@ -6,12 +6,11 @@ import venv
 import sys
 import stat
 import profiler_runner
-
-token = ''
+import secret
 
 def get_pr_info(owner, repo, pr_number):
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
-    headers = {"Authorization": f"Bearer {token}"}
+    headers = {"Authorization": f"Bearer {secret.token}"}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()
