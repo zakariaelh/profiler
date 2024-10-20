@@ -1,20 +1,14 @@
 import time
 
-
 def my_function(n):
     """Performs a computationally intensive task."""
-    result = 0
-    for i in range(n):
-        result += i * i
-    return result
-
+    # Use list comprehension and sum() for better performance
+    return sum(i * i for i in range(n))
 
 def bar(n):
-    result = 0
-    for i in range(n):
-        for j in range(n):
-            result += (i * j) % 2
-    return result
+    # Use numpy for vectorized operations
+    import numpy as np
+    return np.sum((np.arange(n)[:, None] * np.arange(n)) % 2)
 
 
 def main():
