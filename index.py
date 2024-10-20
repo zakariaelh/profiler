@@ -48,12 +48,12 @@ def main(repo: str, owner: str, pr_number: int):
     print(f"Received request for repo: {repo}, owner: {owner}, PR: {pr_number}")
 
     pr_info = get_pr_information(owner, repo, pr_number)
-    base_hash = pr_info['base']['sha']
+    # base_hash = pr_info['base']['sha']
     
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
 
-    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'branch_name': base_hash, 'return_dict': return_dict, 'key': 'before'})
+    p1 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'branch_name': 'main', 'return_dict': return_dict, 'key': 'before'})
     p2 = multiprocessing.Process(target=get_latency_profile, args=(owner, repo), kwargs={'pr_number': pr_number, 'return_dict': return_dict, 'key': 'after'})
 
     # start processes 
