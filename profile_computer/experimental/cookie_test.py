@@ -11,7 +11,7 @@ def some_function(n):
 
 def main():
     """Main function to demonstrate profiling with string."""
-    n = 14
+    n = 15
     start_time = time.time()
     result = some_function(n)
     end_time = time.time()
