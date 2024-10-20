@@ -68,23 +68,6 @@ def add_file_content_inplace(file, owner, repo) -> str:
 def _get_pr_files(pull_request) -> List[dict]:
     return [i.raw_data for i in pull_request.get_files()]
 
-def get_prompt():
-    return """
-    Given the following information about a file that has been changed and its latency profile, what optimizations would you suggest to reduce latency? Only suggest changes when you're confident they will improve the latency, as the results will be evaluated by a profiler.
-
-    File path: {file_name}
-    
-    File content: {file_content}
-    
-    File changes: {patch}
-
-    Latency profile results: {latency_results}"
-
-    Please provide specific optimization suggestions based on this information. Return the file updated with the changes made.
-    """
-
-def get_system_message():
-    return """You are an AI assistant and a smart software engineer. You are specialized in improving code performance and runtime."""
 
 def get_changes_from_llm(file, latency_profile):
     prompt = get_prompt(file, latency_profile=latency_profile)
@@ -92,36 +75,6 @@ def get_changes_from_llm(file, latency_profile):
     changes = send_prompt_to_llm(prompt)
 
     return changes 
-
-def send_prompt_to_llm(prompt):
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
-
-    message = client.messages.create(
-        max_tokens=4096,
-        system=[
-            {
-                "type": "text",
-                "text": get_system_message()
-            }
-        ],
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            },
-            {
-                "role": "assistant",
-                "content": "Below is the original file with the updated optimizations made:"
-            }
-        ],
-        model="claude-3-5-sonnet-20240620",
-    )
-    resp = message.content
-
-    print(f"Usage: {message.usage}")
-    if resp:
-        return resp[0].text
-
 
 def get_pull_requests(owner, repo):
     """
@@ -264,6 +217,8 @@ def generate_pull_request(branch_name: str, owner: str, repo: str):
 
     return pr.html_url
 
+def is_python_file(filename):
+    return filename.lower().endswith('.py')
 
 
 def main(owner, repo, pr_number):
@@ -280,18 +235,19 @@ def main(owner, repo, pr_number):
     pr_files = get_pr_files(owner=owner, repo=repo, pr_number=pr_number)
 
     for file in tqdm(pr_files):
-        # add directory data 
-        file['local_file_path'] = os.path.join(full_directory, file['filename'])
-        # get code changes 
-        res = CodeChangeGenerator().get_response(file, latency_results=latency_profile)
-        code_change_lol = combine_close_changes(res.changes)
-        for i in code_change_lol:
-            patch = LineChangeFixer().get_response(file=file, code_change_list=i)
-            # get changes and update 
-            apply_patch_to_file(patch, file)
-        
-            if patch.patch is not None:
-                changes_made = True 
+        if is_python_file(file):
+            # add directory data 
+            file['local_file_path'] = os.path.join(full_directory, file['filename'])
+            # get code changes 
+            res = CodeChangeGenerator().get_response(file, latency_results=latency_profile)
+            code_change_lol = combine_close_changes(res.changes)
+            for i in code_change_lol:
+                patch = LineChangeFixer().get_response(file=file, code_change_list=i)
+                # get changes and update 
+                apply_patch_to_file(patch, file)
+            
+                if patch.patch is not None:
+                    changes_made = True 
 
     if changes_made:
         publish_branch(local_branch_name=branch_name, directory=full_directory)
